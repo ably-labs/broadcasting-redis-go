@@ -1,0 +1,29 @@
+<html>
+  <body>
+    <h1>Trades</h1>
+    <p>This page is subscribed to the channel 'trades' in Ably, and should add these updates under this text.</p>
+    <ul class="row" id="messages"></ul>
+
+  </body>
+
+  <!-- Include the latest Ably Library  -->
+  <script src="https://cdn.ably.io/lib/ably.min-1.js"></script>
+
+  <!-- Instance the Ably library  -->
+  <script type="text/javascript">
+    let realtime = new Ably.Realtime("INSERT_API_KEY_HERE"); /* ADD YOUR API KEY HERE */
+
+    /* Subscribe to messages on the trades channel */
+    let channel = realtime.channels.get("trades");
+    channel.subscribe(function(msg) {
+      show(msg.data);
+    });
+
+    function show(msg) {
+      let list = document.createElement("LI");
+      let text = document.createTextNode(msg);
+      list.appendChild(text); 
+      document.getElementById("messages").appendChild(list);
+    }
+  </script>
+</html>

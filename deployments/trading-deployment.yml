@@ -1,0 +1,24 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: trading-server
+spec:
+  replicas: 1 # Number of pods to have within this deployment
+  selector:
+    matchLabels:
+      app: trading-server
+  template: # Template for Pods within this deployment
+    metadata:
+      labels: # The label used for pods within this deployment
+        app: trading-server
+    spec: # Details on the Docker Container to use in each Pod
+      containers:
+      - name: trading-server
+        image: tomably/trading-server:latest
+        imagePullPolicy: Always
+        env: # Environment variables passed to the container
+          - name: REDIS_HOST
+            value: redis-service
+          - name: REDIS_PORT
+            value: "6379"    

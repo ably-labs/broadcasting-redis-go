@@ -1,0 +1,28 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ably-publisher
+spec:
+  replicas: 3 # Number of pods to have within this deployment
+  selector:
+    matchLabels:
+      app: ably-publisher
+  template: # Template for Pods within this deployment
+    metadata:
+      labels: # The label used for pods within this deployment
+        app: ably-publisher
+    spec:
+      containers:
+      - name: ably-publisher
+        image: tomably/go-redis-ably-publisher:latest
+        imagePullPolicy: Always
+        env: # Environment variables passed to the container
+          - name: REDIS_HOST
+            value: redis-service
+          - name: REDIS_PORT
+            value: "6379"
+          - name: ABLY_KEY
+            value: "INSERT_API_KEY_HERE"
+          - name: RATE_LIMIT
+            value: "50"

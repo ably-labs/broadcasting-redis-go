@@ -1,0 +1,33 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis-deployment # Unique name for the deployment
+  labels:
+    app: redis # Label used to select this deployment
+spec:
+  selector:
+    matchLabels:
+      app: redis
+  replicas: 1 # Number of pods to run in this deployment
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec: # Spec for the Docker Container inside of the Pod
+      containers:
+      - name: redis-container
+        image: redis # Use the generic Redis Docker Image
+---        
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-service
+  labels:
+    app: redis
+spec:
+  ports:
+  - port: 6379
+    targetPort: 6379
+  selector: # Pods with the 'app: redis' label will use this service
+    app: redis
