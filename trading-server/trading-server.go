@@ -79,4 +79,3 @@ func publishingLoop(redisClient *redis.Client) {
 		}
 	}
 }
-

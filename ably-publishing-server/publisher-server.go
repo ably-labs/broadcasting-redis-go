@@ -54,7 +54,7 @@ func getRedis() *redis.Client {
 	return client
 }
 
-func transactionWithRedis(client *redis.Client, channel ably.RealtimeChannel) error {
+func transactionWithRedis(client *redis.Client, channel *ably.RealtimeChannel) error {
 	// Redis key where messages from the trading server are stored
 	redisQueueName := getEnv("QUEUE_KEY", "myJobQueue")
 
@@ -91,7 +91,7 @@ func transactionWithRedis(client *redis.Client, channel ably.RealtimeChannel) er
 				return err
 			}
 
-			_, err = channel.Publish("trade", messageToPublish[1])
+			err = channel.Publish(ctx, "trade", messageToPublish[1])
 			if err != nil {
 				fmt.Println(err)
 			}
@@ -103,24 +103,20 @@ func transactionWithRedis(client *redis.Client, channel ably.RealtimeChannel) er
 	return err
 }
 
-func getAblyChannel() ably.RealtimeChannel {
-	opts := &ably.ClientOptions{
-		AuthOptions: ably.AuthOptions{
-			// If you have an Ably account, you can find
-			// your API key at https://www.ably.io/accounts/any/apps/any/app_keys
-			Key: getEnv("ABLY_KEY", "No key specified"),
-		},
-		// NoEcho:   true, // Uncomment to stop messages you send from being sent back
-	}
-
+func getAblyChannel() *ably.RealtimeChannel {
 	// Connect to Ably using the API key and ClientID specified above
-	ablyClient, err := ably.NewRealtimeClient(opts)
+	ablyClient, err := ably.NewRealtime(
+		// If you have an Ably account, you can find
+		// your API key at https://www.ably.io/accounts/any/apps/any/app_keys
+		ably.WithKey(getEnv("ABLY_KEY", "No key specified")),
+		// ably.WithEchoMessages(false) // // Uncomment to stop messages you send from being sent back
+	)
 	if err != nil {
 		panic(err)
 	}
 
 	// Connect to the Ably Channel with name 'trades'
-	return *ablyClient.Channels.Get(getEnv("CHANNEL_NAME", "trades"))
+	return ablyClient.Channels.Get(getEnv("CHANNEL_NAME", "trades"))
 }
 
 func getEnv(envName, valueDefault string) string {
